@@ -207,8 +207,10 @@ public class TarotController {
                         .path("message")
                         .path("content");
 
-        if (contentNode.isMissingNode()
-                || contentNode.asText().isBlank()) {
+        if (!contentNode.isTextual()
+                || contentNode.asText().isBlank()
+                || "null".equalsIgnoreCase(contentNode.asText().trim())
+                || "undefined".equalsIgnoreCase(contentNode.asText().trim())) {
 
             throw new RuntimeException(
                     "ไม่พบ content จาก AI"
@@ -250,9 +252,10 @@ public class TarotController {
                     "ช่วงนี้ใจมันฟุ้ง ๆ นะ 🌙";
         }
 
-        if (result.isBlank()) {
-
-            result = content;
+        if (!jsonNode.path("result").isTextual() || result.isBlank()
+                || "null".equalsIgnoreCase(result.trim())
+                || "undefined".equalsIgnoreCase(result.trim())) {
+            throw new IllegalStateException("AI returned an empty reading; please retry");
         }
 
         return Map.of(
